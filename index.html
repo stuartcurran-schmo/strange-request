@@ -4,82 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="An experimental to-do list built on structured procrastination. Every note is a message from a stranger you get to review.">
-<style>
-  :root { color-scheme: light; }
-  body { margin: 0; }
-  img { max-width: 100%; }
-  [hidden] { display: none !important; }
-</style>
 <title>Strange Request</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Chakra+Petch:wght@600;700&family=Courier+Prime:wght@400;700&family=Reenie+Beanie&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  /* Layout: one narrow column, like a paperback page. A flat cover block with venetian-blind shadow
-     bars opens the page; notes are typed slips with the user's own edits added in a second pen.
-     Light is the yellowed paperback. Dark is cyber noir. Same structure, different skin. */
+  /* Layout: one narrow column that fits a phone screen. A slim cover with venetian-blind shadow bars
+     sits on top, then the desk (two slips), a one-line quick add, and two drawers for the file and
+     the case notes. Rare actions live behind a menu. Cyber noir throughout. */
   :root {
-    --bg: #DBC98F;
-    --slip: #E8DBAE;
-    --slip-dim: #DDCE9B;
-    --field: #F2E8C4;
-    --ink: #211B14;
-    --ink-soft: #574B33;
-    --rule: #A5926A;
-    --cover: #7A1C15;
-    --cover-ink: #F0E4BE;
-    --cover-soft: #E3C6AE;
-    --blind: rgba(28, 5, 3, 0.36);
-    --pen: #A81F17;
-    --primary: #7A1C15;
-    --on-primary: #F5EBC8;
-    --hover: rgba(33, 27, 20, 0.09);
-    --focus: #7A1C15;
-    --shadow: rgba(33, 27, 20, 0.24);
-    --title-shadow: 3px 3px 0 rgba(20, 4, 2, 0.4);
-    --track-on: #7A1C15;
-    --f-display: 'Alfa Slab One', Rockwell, Georgia, serif;
-    --f-type: 'Special Elite', 'Courier New', monospace;
-    --f-meta: 'Courier Prime', 'Courier New', monospace;
-    --f-hand: 'Reenie Beanie', 'Bradley Hand', cursive;
-    --h1-weight: 400;
-    --hand-size: 1.4rem;
-    --note-size: 1.2rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0A0D14;
-      --slip: #111826;
-      --slip-dim: #0D121D;
-      --field: #0A0F19;
-      --ink: #D3DAE8;
-      --ink-soft: #8C98AE;
-      --rule: #27324A;
-      --cover: #0D1320;
-      --cover-ink: #EEF1F8;
-      --cover-soft: #9CA8BF;
-      --blind: rgba(255, 61, 139, 0.17);
-      --pen: #FF6FA8;
-      --primary: #FF3D8B;
-      --on-primary: #12060C;
-      --hover: rgba(255, 61, 139, 0.13);
-      --focus: #FF6FA8;
-      --shadow: rgba(0, 0, 0, 0.55);
-      --title-shadow: 0 0 22px rgba(255, 61, 139, 0.5);
-      --track-on: #FF3D8B;
-      --f-display: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
-      --f-type: 'Share Tech Mono', 'Courier New', monospace;
-      --f-meta: 'Share Tech Mono', 'Courier New', monospace;
-      --f-hand: 'Share Tech Mono', 'Courier New', monospace;
-      --h1-weight: 700;
-      --hand-size: 0.95rem;
-      --note-size: 1.05rem;
-      color-scheme: dark;
-    }
-  }
-
-  :root[data-theme="dark"] {
     --bg: #0A0D14;
     --slip: #111826;
     --slip-dim: #0D121D;
@@ -104,8 +37,9 @@
     --f-meta: 'Share Tech Mono', 'Courier New', monospace;
     --f-hand: 'Share Tech Mono', 'Courier New', monospace;
     --h1-weight: 700;
-    --hand-size: 0.95rem;
-    --note-size: 1.05rem;
+    --h1-size: clamp(1.9rem, 8.5vw, 2.9rem);
+    --hand-size: 0.92rem;
+    --note-size: 1.02rem;
     color-scheme: dark;
   }
 
@@ -117,20 +51,20 @@
     font-family: var(--f-type);
     font-size: 1rem;
     line-height: 1.5;
-    padding-block: 28px 72px;
+    padding-block: 18px 40px;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
 
   .wrap {
-    max-width: 640px;
+    max-width: 600px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 14px;
   }
 
-  .front { display: flex; flex-direction: column; gap: 14px; }
+  .view { display: flex; flex-direction: column; gap: 14px; }
 
   /* Cover */
   .cover {
@@ -139,59 +73,53 @@
     overflow: hidden;
     background: var(--cover);
     color: var(--cover-ink);
-    padding: 22px 22px 28px;
+    padding: 14px 16px 14px;
     border-radius: 2px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 4px;
   }
   .cover::before {
     content: "";
     position: absolute;
-    inset: -25% -10%;
+    inset: -30% -10%;
     z-index: -1;
-    background: repeating-linear-gradient(172deg, transparent 0 20px, var(--blind) 20px 38px);
+    background: repeating-linear-gradient(172deg, transparent 0 14px, var(--blind) 14px 26px);
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.15) 100%);
     mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.15) 100%);
   }
-  .cover-meta {
-    margin: 0;
-    font-family: var(--f-meta);
-    font-size: 0.82rem;
-    color: var(--cover-soft);
+  .cover-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
   }
   .cover h1 {
     margin: 0;
     font-family: var(--f-display);
     font-weight: var(--h1-weight);
-    font-size: clamp(2.7rem, 12vw, 4.6rem);
-    line-height: 0.98;
+    font-size: var(--h1-size);
+    white-space: nowrap;
+    line-height: 1;
     letter-spacing: -0.01em;
     text-wrap: balance;
     text-shadow: var(--title-shadow);
+    min-width: 0;
   }
-  .cover-line {
+  .cover-meta {
     margin: 0;
-    max-width: 38ch;
-    font-size: 1rem;
+    font-family: var(--f-meta);
+    font-size: 0.8rem;
+    color: var(--cover-soft);
+  }
+  .cover .menu-btn {
+    flex: none;
     color: var(--cover-ink);
   }
 
-  /* Control bar */
-  .bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px 16px;
-  }
-  .tip-group {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 12px;
-    min-width: 0;
-  }
+  /* Menu */
+  .menu { gap: 12px; }
+  .menu-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
   .bar-label {
     font-family: var(--f-meta);
     font-size: 0.82rem;
@@ -199,6 +127,7 @@
     min-width: 0;
   }
   .bar-label strong { color: var(--ink); }
+  .on-about #tip-controls { display: none; }
 
   .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex: none; }
   .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
@@ -230,8 +159,9 @@
     font-size: 0.82rem;
     color: var(--ink-soft);
   }
+  .on-about .status { display: none; }
 
-  /* Headings */
+  /* Headings (About) */
   h2 {
     margin: 0 0 14px;
     padding-bottom: 6px;
@@ -249,46 +179,76 @@
   }
 
   /* Slips */
-  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
 
   .slip {
     background: var(--slip);
     border: 1px solid var(--rule);
     border-radius: 2px;
     box-shadow: 0 2px 0 var(--shadow);
-    padding: 18px 20px;
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     min-width: 0;
+    position: relative;
+    overflow: hidden;
   }
   .slip.dim { background: var(--slip-dim); }
   .slip.dim .note-text { color: var(--ink-soft); }
+  .slip.compact { padding: 11px 14px; }
 
-  .tag {
-    align-self: flex-start;
+  .slip-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  .slip-head .meta { flex: 1 1 180px; min-width: 0; }
+
+  .flash {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 72px;
+    height: 72px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .flash span {
+    position: absolute;
+    top: 13px;
+    right: -26px;
+    width: 100px;
+    padding: 2px 0;
+    text-align: center;
+    transform: rotate(45deg);
     font-family: var(--f-meta);
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    padding: 2px 8px;
-    border: 1.5px solid var(--pen);
-    color: var(--pen);
+    letter-spacing: 0.04em;
+    background: var(--ink-soft);
+    color: var(--slip);
   }
-  .tag.herring {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: var(--on-primary);
-  }
+  .flash.decoy span { background: var(--primary); color: var(--on-primary); }
+  .slip.has-flash .slip-head { padding-right: 44px; }
 
   .note-text {
+    display: block;
+    width: 100%;
     margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    text-align: left;
+    font-family: var(--f-type);
     font-size: var(--note-size);
     line-height: 1.35;
+    color: var(--ink);
+    cursor: text;
     overflow-wrap: anywhere;
   }
+  .note-text:hover { text-decoration: underline dashed var(--rule); text-underline-offset: 4px; }
+  .note-text:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
   .struck {
     margin: 0;
-    font-size: 0.98rem;
+    font-size: 0.92rem;
     color: var(--ink-soft);
     text-decoration: line-through;
     text-decoration-color: var(--pen);
@@ -299,27 +259,38 @@
     margin: 0;
     font-family: var(--f-hand);
     font-size: var(--hand-size);
-    line-height: 1.15;
+    line-height: 1.1;
     color: var(--pen);
   }
   .meta {
     margin: 0;
     font-family: var(--f-meta);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
     color: var(--ink-soft);
   }
+  button.meta {
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  button.meta:hover { text-decoration: underline dotted; text-underline-offset: 3px; }
+  button.meta:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   .meta .flag { color: var(--pen); font-weight: 700; }
 
   .helper {
-    margin: -4px 0 0;
+    margin: -2px 0 0;
     font-family: var(--f-meta);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--ink-soft);
   }
   .empty {
     margin: 0;
     font-family: var(--f-meta);
     font-size: 0.9rem;
+    line-height: 1.55;
     color: var(--ink-soft);
   }
 
@@ -343,35 +314,44 @@
   }
 
   /* Buttons */
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-  .btn {
-    font-family: var(--f-meta);
-    font-size: 0.88rem;
-    font-weight: 700;
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; }
+  .act {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     min-height: 36px;
-    padding: 6px 14px;
-    border: 1.5px solid var(--ink);
-    border-radius: 2px;
-    background: transparent;
+    padding: 4px 2px;
+    background: none;
+    border: 0;
+    font-family: var(--f-meta);
+    font-size: 0.9rem;
+    font-weight: 700;
     color: var(--ink);
     cursor: pointer;
   }
-  .btn:hover { background: var(--hover); }
-  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
-  .btn.primary:hover { filter: brightness(1.12); }
-  .btn.ghost { border-color: var(--rule); color: var(--ink-soft); }
-  .btn.redact { background: var(--ink); border-color: var(--ink); color: var(--slip); }
-  .btn.small { min-height: 30px; padding: 3px 10px; font-size: 0.8rem; }
+  .act svg { width: 1.15em; height: 1.15em; flex: none; }
+  .act:hover span { text-decoration: underline; text-underline-offset: 3px; }
+  .act:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .act.primary { color: var(--primary); }
+  .act.quiet { color: var(--ink-soft); font-weight: 400; }
+  .act.danger { color: var(--pen); font-weight: 400; }
+
+  .link-btn {
+    min-height: 32px;
+    padding: 4px 2px;
+    background: none;
+    border: 0;
+    font-family: var(--f-meta);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .link-btn:hover { color: var(--ink); }
+  .link-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
   /* Forms */
-  label {
-    display: block;
-    font-family: var(--f-meta);
-    font-size: 0.8rem;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-  }
   .sr {
     position: absolute;
     width: 1px;
@@ -392,32 +372,44 @@
     color: var(--ink);
   }
   input:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
-  .row { display: flex; flex-wrap: wrap; gap: 12px; }
-  .field { flex: 1 1 150px; min-width: 0; }
+
+  .quick { display: flex; flex-direction: column; gap: 8px; }
+  .quick-row { display: flex; align-items: center; gap: 8px; }
+  .quick-row input { flex: 1 1 auto; }
+  .quick-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+  .quick-opts select, .quick-opts input[type="date"], .amend-opts select, .amend-opts input[type="date"] {
+    width: auto;
+    max-width: 100%;
+    padding: 5px 8px;
+    font-size: 0.88rem;
+  }
+
+  .amend { display: flex; flex-direction: column; gap: 10px; }
+  .amend-opts { display: flex; flex-wrap: wrap; gap: 6px 8px; }
   .inline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .inline input { flex: 1 1 200px; }
-  .amend { border-top: 1px dashed var(--rule); padding-top: 12px; display: flex; flex-direction: column; gap: 12px; }
 
-  /* File rows */
-  details.slip { padding: 0; gap: 0; }
-  details.slip summary {
-    list-style: none;
+  /* Drawers */
+  .drawers { display: flex; gap: 22px; border-bottom: 1px dashed var(--rule); }
+  .drawer-btn {
+    margin-bottom: -1px;
+    min-height: 40px;
+    padding: 6px 0;
+    font-family: var(--f-meta);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
     cursor: pointer;
-    padding: 13px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
   }
-  details.slip summary::-webkit-details-marker { display: none; }
-  details.slip summary:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
-  .file-title { overflow-wrap: anywhere; min-width: 0; }
-  .file-age { font-family: var(--f-meta); font-size: 0.78rem; color: var(--ink-soft); white-space: nowrap; }
-  .file-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .drawer-btn:hover { color: var(--ink); }
+  .drawer-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .drawer-btn[aria-expanded="true"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--pen); }
+  .count { margin-left: 6px; color: var(--pen); }
 
-  /* Case notes */
   .stat {
-    margin: 0 0 14px;
+    margin: 0 0 12px;
     padding: 10px 14px;
     font-family: var(--f-meta);
     font-size: 0.88rem;
@@ -428,13 +420,6 @@
   .entry { padding: 10px 0; border-top: 1px dashed var(--rule); overflow-wrap: anywhere; }
   .entry:first-child { border-top: none; padding-top: 0; }
   .entry .meta { margin-top: 2px; }
-
-  footer { display: flex; flex-wrap: wrap; gap: 10px; }
-
-  /* Views */
-  .view { display: flex; flex-direction: column; gap: 30px; }
-  .bar-right { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
-  .on-about .tip-group, .on-about .status { display: none; }
 
   /* About */
   .prose {
@@ -449,12 +434,13 @@
   .prose p { margin: 0; }
   .prose .about-lead {
     font-family: var(--f-type);
-    font-size: calc(var(--note-size) + 0.08rem);
+    font-size: calc(var(--note-size) + 0.1rem);
     line-height: 1.4;
     max-width: 40ch;
   }
   .view a, .prose a { color: var(--pen); text-underline-offset: 2px; }
   .view a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  #view-about { gap: 26px; }
 
   .map { margin: 0; display: flex; flex-direction: column; }
   .map-row {
@@ -500,88 +486,76 @@
 <body>
 <main class="wrap">
 
-  <div class="front">
-    <header class="cover">
-      <p class="cover-meta" id="cover-meta"></p>
+  <header class="cover">
+    <div class="cover-top">
       <h1>Strange Request</h1>
-      <p class="cover-line">A list left behind by whoever you were last week. Keep it, change it, or find something easier to do.</p>
-    </header>
-
-    <div class="bar">
-      <div class="tip-group" id="tip-controls" hidden>
-        <label class="switch" for="tip-toggle">
-          <input type="checkbox" id="tip-toggle" aria-label="Anonymous tip">
-          <span class="track"></span>
-        </label>
-        <span class="bar-label"><strong>Anonymous tip.</strong> A stranger rewords every note. Meaning stays the same.</span>
-        <button type="button" class="btn ghost small" id="tip-again" hidden>New tip</button>
-      </div>
-      <div class="bar-right">
-        <button type="button" class="btn ghost small" id="about-btn">About this tool</button>
-        <button type="button" class="btn ghost small" id="theme-btn">Night edition</button>
-      </div>
+      <button type="button" class="act menu-btn" id="menu-btn" aria-expanded="false" aria-controls="menu"><span>Menu</span></button>
     </div>
-    <p class="status" id="status" hidden></p>
-  </div>
+    <p class="cover-meta" id="cover-meta">Productivity for procrastinators (experimental)</p>
+  </header>
+
+  <section class="slip menu" id="menu" aria-label="Menu" hidden>
+    <div class="menu-row" id="tip-controls" hidden>
+      <label class="switch" for="tip-toggle">
+        <input type="checkbox" id="tip-toggle" aria-label="Anonymous tip">
+        <span class="track"></span>
+      </label>
+      <span class="bar-label"><strong>Anonymous tip.</strong> A stranger rewords every note.</span>
+      <button type="button" class="act quiet" id="tip-again" hidden><span>New tip</span></button>
+    </div>
+    <div class="menu-row">
+      <button type="button" class="act quiet" id="about-btn"><span>About this tool</span></button>
+    </div>
+    <div class="menu-row">
+      <button type="button" class="act quiet" id="clear-examples" hidden><span>Clear examples</span></button>
+      <button type="button" class="act danger" id="reset-btn"><span>Burn the file</span></button>
+    </div>
+  </section>
+
+  <p class="status" id="status" hidden></p>
 
   <div class="view" id="view-main">
 
-  <section aria-labelledby="h-add">
-    <h2 id="h-add">Leave a note</h2>
-    <form class="slip" id="add-form">
-      <div>
-        <label for="f-text">What does it say?</label>
-        <input type="text" id="f-text" placeholder="Call Dave about the van" maxlength="140" autocomplete="off" required>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="f-mood">Mood when written</label>
-          <select id="f-mood">
-            <option>Calm</option>
-            <option>Rushed</option>
-            <option>Anxious</option>
-            <option>Optimistic</option>
-            <option>Knackered</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="f-importance">How urgent it felt</label>
-          <select id="f-importance">
-            <option value="3">Extremely</option>
-            <option value="2" selected>Fairly</option>
-            <option value="1">Mildly</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="f-deadline">Deadline they gave</label>
-          <input type="date" id="f-deadline">
-        </div>
-      </div>
-      <div class="actions"><button type="submit" class="btn primary">File it</button></div>
-    </form>
-  </section>
-
-  <section aria-labelledby="h-desk">
-    <h2 id="h-desk">On the desk</h2>
     <div class="stack" id="desk"></div>
-  </section>
 
-  <section aria-labelledby="h-file">
-    <h2 id="h-file">In the file</h2>
-    <p class="section-note">Everything else the stranger left, most urgent first.</p>
-    <div class="stack" id="file-list"></div>
-  </section>
+    <form class="quick" id="add-form">
+      <div class="quick-row">
+        <label class="sr" for="f-text">What does the note say?</label>
+        <input type="text" id="f-text" placeholder="Leave a note" maxlength="140" autocomplete="off" required>
+        <button type="submit" class="act primary" id="file-btn"><span>File it</span></button>
+      </div>
+      <div class="quick-opts">
+        <button type="button" class="link-btn" id="feeling-toggle" aria-expanded="false" aria-controls="feeling-wrap">+ feeling</button>
+        <span id="feeling-wrap" hidden>
+          <select id="f-mood" aria-label="Mood when written">
+            <option value="Calm">Feeling calm</option>
+            <option value="Rushed">Feeling rushed</option>
+            <option value="Anxious">Feeling anxious</option>
+            <option value="Optimistic">Feeling optimistic</option>
+            <option value="Knackered">Feeling knackered</option>
+          </select>
+        </span>
+        <button type="button" class="link-btn" id="urgency-toggle" aria-expanded="false" aria-controls="urgency-wrap">+ urgency</button>
+        <span id="urgency-wrap" hidden>
+          <select id="f-importance" aria-label="How urgent it felt">
+            <option value="3">Extremely urgent</option>
+            <option value="2" selected>Fairly urgent</option>
+            <option value="1">Mildly urgent</option>
+          </select>
+        </span>
+        <button type="button" class="link-btn" id="deadline-toggle" aria-expanded="false" aria-controls="deadline-wrap">+ deadline</button>
+        <span id="deadline-wrap" hidden>
+          <label class="sr" for="f-deadline">Deadline they gave</label>
+          <input type="date" id="f-deadline">
+        </span>
+      </div>
+    </form>
 
-  <section aria-labelledby="h-cases">
-    <h2 id="h-cases">Case notes</h2>
-    <p class="stat" id="stat"></p>
-    <div id="ledger-list"></div>
-  </section>
-
-  <footer>
-    <button type="button" class="btn ghost small" id="clear-examples" hidden>Clear examples</button>
-    <button type="button" class="btn ghost small" id="reset-btn">Burn the file</button>
-  </footer>
+    <div class="drawers">
+      <button type="button" class="drawer-btn" id="drawer-file" data-action="drawer" data-id="file" aria-expanded="false" aria-controls="drawer-panel">In the file</button>
+      <button type="button" class="drawer-btn" id="drawer-cases" data-action="drawer" data-id="cases" aria-expanded="false" aria-controls="drawer-panel">Case notes</button>
+    </div>
+    <div id="drawer-panel" hidden></div>
 
   </div>
 
@@ -590,73 +564,56 @@
     <section aria-labelledby="a-what">
       <h2 id="a-what">What this is</h2>
       <div class="prose">
-        <p class="about-lead">A to-do list that assumes you cannot fully trust a plan your earlier self made.</p>
-        <p>Strange Request is an experimental to-do list. It starts from John Perry's essay on <a href="https://structuredprocrastination.com/" target="_blank" rel="noopener noreferrer">structured procrastination</a>, which suggests that people who put things off can still get a great deal done. The trick is to keep one important task at the top of the list and do everything else as a way of avoiding it. This version keeps that joke and builds its mechanics on findings from procrastination research.</p>
-      </div>
-    </section>
-
-    <section aria-labelledby="a-stranger">
-      <h2 id="a-stranger">Notes from a stranger</h2>
-      <div class="prose">
-        <p>Every note on the list was written earlier, in some mood, with a guess about how today would go. Research on the future self, associated with Hal Hershfield and drawing on the philosopher Derek Parfit, finds that people tend to think about their future self in ways that resemble thinking about another person. A weaker sense of connection to that person goes with a preference for smaller, sooner rewards.</p>
-        <p>If that is roughly right, a plan is a promise made on someone else's behalf. The list keeps that in view. Each note shows who wrote it, how they felt and how urgent they thought it was. You review each note before acting on it, the way you would check a list you found.</p>
+        <p class="about-lead">A to-do list that assumes you can't fully trust a plan your earlier self made.</p>
+        <p>Built on John Perry's <a href="https://structuredprocrastination.com/" target="_blank" rel="noopener noreferrer">structured procrastination</a>: keep one important task at the top and get everything else done as a way of avoiding it. Each note is treated as a message from a stranger, your past self, who wrote it in some mood with a guess about today. Review it before acting on it.</p>
       </div>
     </section>
 
     <section aria-labelledby="a-parts">
-      <h2 id="a-parts">How each part works</h2>
+      <h2 id="a-parts">How it works</h2>
       <dl class="map">
         <div class="map-row">
-          <dt>Mood and urgency on each note</dt>
-          <dd>You record how you felt and how urgent the note seemed when you wrote it. Plans tend to be made in a calm, abstract state and carried out in a tired or tempted one. George Loewenstein called this the hot-cold empathy gap. With the mood shown beside the note, today's you can discount it.</dd>
+          <dt>Feeling and urgency</dt>
+          <dd>Record the mood a note was written in, so today's you can discount it. Plans are made calm and carried out tired (Loewenstein's hot-cold empathy gap).</dd>
         </div>
         <div class="map-row">
           <dt>Deadlines and the score line</dt>
-          <dd>People underestimate how long tasks take, even when similar tasks ran late before. Daniel Kahneman and Amos Tversky named this the planning fallacy. When you finish a note that had a deadline, the line under Case notes compares the deadline with the day you finished, so you build a record of how reliable those deadlines are.</dd>
+          <dd>We underestimate how long things take (the planning fallacy). Finished notes compare deadline with actual day, so you see how reliable your deadlines are.</dd>
         </div>
         <div class="map-row">
-          <dt>Still open and red herring</dt>
-          <dd>This is Perry's trick made visible. Your most urgent note stays at the top, dimmed. The next one is promoted as the red herring, the thing to do first. Piers Steel's temporal motivation theory says we put off tasks whose payoff is distant or whose effort is unpleasant, and drift to whatever is nearer and easier. The desk uses that drift.</dd>
+          <dt>Open and Decoy</dt>
+          <dd>Your top note stays Open, dimmed. The next is the Decoy, promoted as the thing to do first. People drift to what is nearer and easier (Steel), so the desk uses the drift.</dd>
         </div>
         <div class="map-row">
-          <dt>Keep, Push down, Amend</dt>
-          <dd>Keep says the plan still holds. Push down admits it is not happening today and does not delete it. Amend rewrites the note and leaves the old wording struck through, so the change stays visible. George Ainslie's work on hyperbolic discounting suggests our preferences shift as the moment of action gets close, so your earlier and later selves can disagree sincerely. These controls let you renegotiate with them.</dd>
+          <dt>Push down and Amend</dt>
+          <dd>Push down admits a note isn't happening today. Amend rewrites it with the old wording struck through. Our preferences shift as action nears (Ainslie), so you renegotiate with your earlier self.</dd>
         </div>
         <div class="map-row">
           <dt>Case notes</dt>
-          <dd>Anything you finish that is not the top note is logged as work done instead of the top job. You can also add entries by hand. Perry argues that this kind of avoidance can be productive. The log lets you check whether that holds for you, and whether the notes you keep pushing down ever mattered.</dd>
+          <dd>Finishing anything but the top note is logged as work done instead. Check whether the avoidance pays off, and whether pushed-down notes ever mattered.</dd>
         </div>
         <div class="map-row">
           <dt>Anonymous tip</dt>
-          <dd>An optional switch that asks Claude to reword every note as if a different person had written it. Your own wording stays underneath. This one is a hunch more than a research finding. Seeing a note in unfamiliar words may loosen your attachment to the first version, and it makes the list read like something you found.<span id="tip-note" hidden> The switch only appears where the page can reach Claude. If you do not see it, it is not available in this copy.</span></dd>
+          <dd>Optional. Claude rewords every note as if someone else wrote it. A hunch, not a finding: unfamiliar words may loosen your attachment to the first version.<span id="tip-note" hidden> Only appears where the page can reach Claude.</span></dd>
         </div>
       </dl>
     </section>
 
-    <section aria-labelledby="a-research">
-      <h2 id="a-research">What the research says</h2>
-      <div class="prose">
-        <p>Most researchers treat procrastination as a failure of self-regulation and not as a time-management problem. Steel's 2007 meta-analysis found the strongest links to task aversiveness, low confidence in one's ability to do the task, impulsiveness and low conscientiousness. Fuschia Sirois and Timothy Pychyl describe procrastination as putting short-term mood repair ahead of the long-term interests of the future self.</p>
-        <p>This tool leans on that mainstream work. It makes no claims about trauma or clinical conditions.</p>
-      </div>
-    </section>
-
     <section aria-labelledby="a-limits">
       <h2 id="a-limits">What it does not claim</h2>
-      <p class="caveat">Nobody has tested whether this arrangement reduces procrastination. The link between each feature and its source is design reasoning, and the research behind each idea describes general tendencies, not what will work for you. This is a toy and an experiment. It is not therapy and not a clinical tool. If procrastination is causing you real difficulty, a professional can help in ways a to-do list cannot.</p>
+      <p class="caveat">Nobody has tested whether this reduces procrastination. The links to the research are design reasoning, and the research describes general tendencies, not what will work for you. It's a toy and an experiment, not therapy or a clinical tool. It makes no claims about trauma or clinical conditions.</p>
     </section>
 
     <section aria-labelledby="a-data">
       <h2 id="a-data">Your data</h2>
       <div class="prose">
-        <p>Notes, case notes and your edits are saved in this browser, on this device, and are not uploaded anywhere. Clearing your browser data erases them. If you switch on Anonymous tip, the text of your notes is sent to Claude to be reworded. That uses your own Claude usage, and the page asks your permission first.</p>
-        <p>The four example notes are samples. Clear examples removes them.</p>
+        <p>Everything is saved in this browser only. Clearing browser data erases it. If you switch on Anonymous tip, your note text is sent to Claude to be reworded, using your own Claude usage, after the page asks permission. Clear examples in the menu removes the sample notes.</p>
       </div>
     </section>
 
     <section aria-labelledby="a-reading">
       <h2 id="a-reading">Reading</h2>
-      <p class="section-note">The ideas above come from these sources. Check the originals before quoting any detail.</p>
+      <p class="section-note">Check the originals before quoting any detail.</p>
       <ul class="refs">
         <li>Perry, J. Structured procrastination. <a href="https://structuredprocrastination.com/" target="_blank" rel="noopener noreferrer">structuredprocrastination.com</a></li>
         <li>Steel, P. (2007). The nature of procrastination: a meta-analytic and theoretical review of quintessential self-regulatory failure. Psychological Bulletin.</li>
@@ -669,7 +626,7 @@
       </ul>
     </section>
 
-    <div class="actions"><button type="button" class="btn" id="about-back">Back to the list</button></div>
+    <div class="actions"><button type="button" class="act" id="about-back"><span>Back to the list</span></button></div>
 
   </div>
 
@@ -683,6 +640,11 @@
   function uid() { return Math.random().toString(36).slice(2, 10); }
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function isoAgo(d) { return new Date(Date.now() - d * DAY).toISOString(); }
+  function isoAgoAt(d, h) {
+    var x = new Date(Date.now() - d * DAY);
+    x.setHours(h, 12, 0, 0);
+    return x.toISOString();
+  }
   function dateIn(d) {
     var x = new Date(Date.now() + d * DAY);
     return x.getFullYear() + '-' + pad(x.getMonth() + 1) + '-' + pad(x.getDate());
@@ -691,10 +653,10 @@
   function seed() {
     return {
       tasks: [
-        { id: uid(), text: 'Finish the Q3 report', mood: 'Anxious', importance: 3, deadline: dateIn(-2), createdAt: isoAgo(9), marks: [], struck: [], example: true },
-        { id: uid(), text: 'Book the dentist', mood: 'Calm', importance: 2, deadline: null, createdAt: isoAgo(6), marks: [], struck: [], example: true },
-        { id: uid(), text: 'Reply to Sam about the venue', mood: 'Rushed', importance: 2, deadline: dateIn(1), createdAt: isoAgo(3), marks: [], struck: [], example: true },
-        { id: uid(), text: 'Sort out the shed', mood: 'Optimistic', importance: 1, deadline: dateIn(5), createdAt: isoAgo(12), marks: [], struck: [], example: true }
+        { id: uid(), text: 'Finish the Q3 report', mood: 'Anxious', importance: 3, deadline: dateIn(-2), createdAt: isoAgoAt(9, 23), marks: [], struck: [], example: true },
+        { id: uid(), text: 'Book the dentist', mood: 'Calm', importance: 2, deadline: null, createdAt: isoAgoAt(6, 9), marks: [], struck: [], example: true },
+        { id: uid(), text: 'Reply to Sam about the venue', mood: 'Rushed', importance: 2, deadline: dateIn(1), createdAt: isoAgoAt(3, 18), marks: [], struck: [], example: true },
+        { id: uid(), text: 'Sort out the shed', mood: 'Optimistic', importance: 1, deadline: dateIn(5), createdAt: isoAgoAt(12, 10), marks: [], struck: [], example: true }
       ],
       closed: [
         { id: uid(), text: 'Renew the car insurance', deadline: dateIn(-6), completedAt: isoAgo(3), example: true }
@@ -734,9 +696,12 @@
   var tipText = {};
   var transient = '';
   var transientTimer = null;
+  var menuOpen = false;
   var openAmendId = null;
   var openLedger = false;
-  var openFiles = {};
+  var openMeta = {};
+  var openDrawer = null;
+  var scrollToDrawer = false;
   var focusSel = null;
   var resetArmed = false;
   var resetTimer = null;
@@ -753,6 +718,31 @@
     });
   }
 
+  var ICONS = {
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+    enter: '<path d="M19 5v7a3 3 0 0 1-3 3H5"/><path d="M9 11l-4 4 4 4"/>',
+    swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    trash: '<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    flame: '<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2.2-4.2.2 1.8 1 2.7 2 2.7C11.2 8.5 11 6 12 3z"/>',
+    refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>'
+  };
+
+  function icon(name) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + ICONS[name] + '</svg>';
+  }
+
+  function setAct(id, name, label) {
+    $(id).innerHTML = icon(name) + '<span>' + escapeHTML(label) + '</span>';
+  }
+
   function daysAgo(iso) {
     var d = Math.floor((Date.now() - new Date(iso).getTime()) / DAY);
     if (d <= 0) return 'today';
@@ -764,9 +754,17 @@
     var d = new Date(s + 'T00:00:00');
     return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
   }
+  function fmtShort(s) {
+    var d = new Date(s + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  }
 
   function isOverdue(t) {
     return !!t.deadline && new Date(t.deadline + 'T23:59:59').getTime() < Date.now();
+  }
+  function isLate(t) {
+    var h = new Date(t.createdAt).getHours();
+    return h >= 22 || h < 5;
   }
 
   function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
@@ -789,42 +787,59 @@
     return escapeHTML(t.text);
   }
 
-  function metaLine(t) {
-    var s = 'Typed by a stranger who was ' + MOOD[t.mood] + ', ' + daysAgo(t.createdAt) + '. They thought it was ' + URG[t.importance] + '.';
+  function shortMeta(t) {
+    var bits = [];
+    if (t.mood) bits.push(t.mood);
+    if (isLate(t)) bits.push('written late');
+    bits.push(daysAgo(t.createdAt));
+    if (t.deadline) bits.push(isOverdue(t) ? 'deadline passed' : 'due ' + fmtShort(t.deadline));
+    var s = bits.join(', ');
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  function fullMeta(t) {
+    var at = new Date(t.createdAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    var who = (t.mood && MOOD[t.mood]) ? 'Typed by a stranger who was ' + MOOD[t.mood] : 'Typed by a stranger';
+    var s = who + ', at ' + at + ', ' + daysAgo(t.createdAt) + '. They thought it was ' + URG[t.importance] + '.';
     if (t.deadline) {
-      s += ' Deadline given: ' + fmtDate(t.deadline);
-      s += isOverdue(t) ? ' <span class="flag">(passed)</span>.' : '.';
+      s += ' Deadline given: ' + fmtDate(t.deadline) + (isOverdue(t) ? ' <span class="flag">(passed)</span>.' : '.');
     }
     if (t.example) s += ' Example note.';
     return s;
   }
 
-  function btn(action, id, label, cls) {
-    return '<button type="button" class="btn' + (cls ? ' ' + cls : '') + '" data-action="' + action + '" data-id="' + id + '">' + label + '</button>';
+  function metaHTML(t) {
+    var open = !!openMeta[t.id];
+    return '<button type="button" class="meta" data-action="meta" data-id="' + t.id + '" aria-expanded="' + open + '">' +
+      (open ? fullMeta(t) : escapeHTML(shortMeta(t))) + '</button>';
   }
 
-  function select(cls, options, selected) {
-    return '<select class="' + cls + '">' + options.map(function (o) {
+  function act(action, id, label, icn, cls) {
+    return '<button type="button" class="act' + (cls ? ' ' + cls : '') + '" data-action="' + action + '" data-id="' + id + '">' + icon(icn) + '<span>' + label + '</span></button>';
+  }
+
+  function select(cls, label, options, selected) {
+    return '<select class="' + cls + '" aria-label="' + label + '">' + options.map(function (o) {
       return '<option value="' + o[0] + '"' + (String(o[0]) === String(selected) ? ' selected' : '') + '>' + o[1] + '</option>';
     }).join('') + '</select>';
   }
 
   function amendFormHTML(t) {
-    var moods = ['Calm', 'Rushed', 'Anxious', 'Optimistic', 'Knackered'].map(function (m) { return [m, m]; });
-    var urg = [[3, 'Extremely'], [2, 'Fairly'], [1, 'Mildly']];
+    var moods = [['', 'No mood noted'], ['Calm', 'Feeling calm'], ['Rushed', 'Feeling rushed'], ['Anxious', 'Feeling anxious'], ['Optimistic', 'Feeling optimistic'], ['Knackered', 'Feeling knackered']];
+    var urg = [[3, 'Extremely urgent'], [2, 'Fairly urgent'], [1, 'Mildly urgent']];
     return (
       '<form class="amend" data-amend-id="' + t.id + '">' +
-        '<div><label for="rw-text">Amend the note</label>' +
-        '<input type="text" id="rw-text" class="rw-text" value="' + escapeHTML(t.text) + '" maxlength="140" autocomplete="off"></div>' +
-        '<div class="row">' +
-          '<div class="field"><label>Mood when written</label>' + select('rw-mood', moods, t.mood) + '</div>' +
-          '<div class="field"><label>How urgent now</label>' + select('rw-importance', urg, t.importance) + '</div>' +
-          '<div class="field"><label>Deadline</label><input type="date" class="rw-deadline" value="' + (t.deadline || '') + '"></div>' +
+        '<label class="sr" for="rw-text">Amend the note</label>' +
+        '<input type="text" id="rw-text" class="rw-text" value="' + escapeHTML(t.text) + '" maxlength="140" autocomplete="off">' +
+        '<div class="amend-opts">' +
+          select('rw-mood', 'Mood when written', moods, t.mood) +
+          select('rw-importance', 'How urgent it feels now', urg, t.importance) +
+          '<input type="date" class="rw-deadline" aria-label="Deadline" value="' + (t.deadline || '') + '">' +
         '</div>' +
         '<div class="actions">' +
-          '<button type="submit" class="btn primary small">Save amendment</button>' +
-          '<button type="button" class="btn small" data-action="cancel-amend">Cancel</button>' +
-          btn('redact', t.id, 'Redact', 'redact small') +
+          '<button type="submit" class="act primary">' + icon('check') + '<span>Save</span></button>' +
+          '<button type="button" class="act quiet" data-action="cancel-amend">' + icon('x') + '<span>Cancel</span></button>' +
+          act('redact', t.id, 'Redact', 'trash', 'danger') +
         '</div>' +
       '</form>'
     );
@@ -835,52 +850,54 @@
       '<form class="inline" data-ledger-form="1">' +
         '<label class="sr" for="ledger-text">What did you do instead?</label>' +
         '<input type="text" id="ledger-text" placeholder="What did you do instead?" maxlength="140" autocomplete="off" required>' +
-        '<button type="submit" class="btn primary small">Add to case notes</button>' +
-        '<button type="button" class="btn small" data-action="cancel-ledger">Cancel</button>' +
+        '<button type="submit" class="act primary">' + icon('plus') + '<span>Add to case notes</span></button>' +
+        '<button type="button" class="act quiet" data-action="cancel-ledger">' + icon('x') + '<span>Cancel</span></button>' +
       '</form>'
     );
   }
 
+  function noteBlock(t) {
+    if (openAmendId === t.id) return amendFormHTML(t);
+    return '<button type="button" class="note-text" data-action="amend" data-id="' + t.id + '" title="Tap to amend">' + displayText(t) + '</button>';
+  }
+
+  function struckHTML(t) {
+    var last = (t.struck || []).slice(-1);
+    return last.map(function (s) { return '<p class="struck">' + escapeHTML(s) + '</p>'; }).join('');
+  }
+
+  function marksHTML(t) {
+    var last = (t.marks || []).slice(-1);
+    return last.map(function (m) { return '<p class="hand">' + escapeHTML(m.t) + ' (' + daysAgo(m.at) + ')</p>'; }).join('');
+  }
+
   function slipHTML(t, role) {
-    var tag = role === 'top' ? '<span class="tag">Still open</span>' : '<span class="tag herring">Red herring</span>';
-    var struck = (t.struck || []).slice(-2).map(function (s) { return '<p class="struck">' + escapeHTML(s) + '</p>'; }).join('');
-    var marks = (t.marks || []).slice(-2).map(function (m) { return '<p class="hand">' + escapeHTML(m.t) + ' (' + daysAgo(m.at) + ')</p>'; }).join('');
-    var actions;
-    if (role === 'top') {
-      actions = btn('keep', t.id, 'Keep') + btn('demote', t.id, 'Push down') + btn('amend', t.id, 'Amend') +
-        btn('ledger-open', t.id, 'Did something else', 'ghost') + btn('complete', t.id, 'Done', 'primary');
-    } else {
-      actions = btn('complete', t.id, 'Done', 'primary') + btn('amend', t.id, 'Amend');
-    }
+    var top = role === 'top';
+    var flash = top ? '<div class="flash"><span>Open</span></div>' : '<div class="flash decoy"><span>Decoy</span></div>';
+    var actions = act('demote', t.id, 'Push down', 'down') + act('complete', t.id, 'Done', 'check', 'primary');
+    if (top) actions += act('ledger-open', t.id, 'I did something else', 'swap', 'quiet');
     return (
-      '<article class="slip' + (role === 'top' ? ' dim' : '') + '">' +
-        tag +
-        struck +
-        '<p class="note-text">' + displayText(t) + '</p>' +
-        marks +
-        '<p class="meta">' + metaLine(t) + '</p>' +
+      '<article class="slip has-flash' + (top ? ' dim' : '') + '">' +
+        flash +
+        '<div class="slip-head">' + metaHTML(t) + '</div>' +
+        struckHTML(t) +
+        noteBlock(t) +
+        marksHTML(t) +
         '<div class="actions">' + actions + '</div>' +
-        (role === 'top' && openLedger ? ledgerFormHTML() : '') +
-        (openAmendId === t.id ? amendFormHTML(t) : '') +
+        (top && openLedger ? ledgerFormHTML() : '') +
       '</article>'
     );
   }
 
   function fileRowHTML(t) {
-    var struck = (t.struck || []).slice(-2).map(function (s) { return '<p class="struck">' + escapeHTML(s) + '</p>'; }).join('');
-    var marks = (t.marks || []).slice(-2).map(function (m) { return '<p class="hand">' + escapeHTML(m.t) + ' (' + daysAgo(m.at) + ')</p>'; }).join('');
     return (
-      '<details class="slip" data-file-id="' + t.id + '"' + (openFiles[t.id] || openAmendId === t.id ? ' open' : '') + '>' +
-        '<summary><span class="file-title">' + displayText(t) + '</span><span class="file-age">' + daysAgo(t.createdAt) + '</span></summary>' +
-        '<div class="file-body">' +
-          struck + marks +
-          '<p class="meta">' + metaLine(t) + '</p>' +
-          '<div class="actions">' +
-            btn('keep', t.id, 'Keep') + btn('demote', t.id, 'Push down') + btn('amend', t.id, 'Amend') + btn('complete', t.id, 'Done', 'primary') +
-          '</div>' +
-          (openAmendId === t.id ? amendFormHTML(t) : '') +
-        '</div>' +
-      '</details>'
+      '<article class="slip compact">' +
+        '<div class="slip-head">' + metaHTML(t) + '</div>' +
+        struckHTML(t) +
+        noteBlock(t) +
+        marksHTML(t) +
+        '<div class="actions">' + act('demote', t.id, 'Push down', 'down') + act('complete', t.id, 'Done', 'check', 'primary') + '</div>' +
+      '</article>'
     );
   }
 
@@ -903,55 +920,66 @@
     return scope + 'the stranger’s deadlines were about right. That is rare.';
   }
 
+  function drawerHTML(sorted) {
+    if (openDrawer === 'file') {
+      var rest = sorted.slice(2);
+      return rest.length
+        ? '<div class="stack">' + rest.map(fileRowHTML).join('') + '</div>'
+        : '<p class="empty">Nothing else in the file.</p>';
+    }
+    if (openDrawer === 'cases') {
+      var led = state.ledger.length
+        ? state.ledger.map(function (e) {
+            return '<div class="entry"><span>Instead of <em>' + escapeHTML(e.dodged) + '</em>: ' + escapeHTML(e.done) + '</span>' +
+              '<p class="meta">' + daysAgo(e.timestamp) + (e.example ? '. Example entry.' : '') + '</p></div>';
+          }).join('')
+        : '<p class="empty">Nothing yet. Finish a note that is not the top job, or log what you did instead, and it lands here.</p>';
+      return '<p class="stat">' + computeStat() + '</p><div>' + led + '</div>';
+    }
+    return '';
+  }
+
   function render() {
     var sorted = sortedTasks();
 
     var desk = $('desk');
-    var fileEl = $('file-list');
     if (!sorted.length) {
-      desk.innerHTML = '<p class="empty">Nothing on file. Leave a note above. With two notes, the desk shows your top job and a red herring to do first.</p>';
-      fileEl.innerHTML = '<p class="empty">The file is empty.</p>';
+      desk.innerHTML = '<p class="empty">A list left behind by whoever you were last week. Leave a note below. With two notes, the desk shows your top job and a decoy to do first.</p>';
     } else {
       var html = slipHTML(sorted[0], 'top');
-      html += '<p class="helper">Keep leaves it where it is. Push down does not delete it, it admits it is not happening today.</p>';
       if (sorted.length > 1) {
         html += slipHTML(sorted[1], 'herring');
+        html += '<p class="helper">Tap a note to amend it.</p>';
       } else {
-        html += '<p class="empty">One note on file, so there is nothing to hide behind yet. Add a second and the desk picks a red herring.</p>';
+        html += '<p class="empty">One note on file, so there is nothing to hide behind yet. Add a second and the desk picks a decoy.</p>';
       }
       desk.innerHTML = html;
-
-      var rest = sorted.slice(2);
-      fileEl.innerHTML = rest.length ? rest.map(fileRowHTML).join('') : '<p class="empty">Nothing else in the file.</p>';
     }
 
-    var overdue = state.tasks.filter(isOverdue).length;
-    $('cover-meta').textContent = state.tasks.length
-      ? plural(state.tasks.length, 'note') + ' on file. ' + overdue + ' past their deadline.'
-      : 'No notes on file.';
+    var fileCount = Math.max(0, sorted.length - 2);
+    $('drawer-file').innerHTML = 'In the file <span class="count">' + fileCount + '</span>';
+    $('drawer-cases').innerHTML = 'Case notes <span class="count">' + state.ledger.length + '</span>';
+    $('drawer-file').setAttribute('aria-expanded', openDrawer === 'file' ? 'true' : 'false');
+    $('drawer-cases').setAttribute('aria-expanded', openDrawer === 'cases' ? 'true' : 'false');
+    var panel = $('drawer-panel');
+    panel.innerHTML = drawerHTML(sorted);
+    panel.hidden = !openDrawer;
 
-    $('stat').textContent = computeStat();
-
-    var led = $('ledger-list');
-    if (!state.ledger.length) {
-      led.innerHTML = '<p class="empty">Nothing yet. Finish a note that is not the top job, or log what you did instead, and it lands here.</p>';
-    } else {
-      led.innerHTML = state.ledger.map(function (e) {
-        return '<div class="entry"><span>Instead of <em>' + escapeHTML(e.dodged) + '</em>: ' + escapeHTML(e.done) + '</span>' +
-          '<p class="meta">' + daysAgo(e.timestamp) + (e.example ? '. Example entry.' : '') + '</p></div>';
-      }).join('');
-    }
 
     var hasExamples = state.tasks.some(function (t) { return t.example; }) ||
       state.closed.some(function (c) { return c.example; }) ||
       state.ledger.some(function (e) { return e.example; });
     $('clear-examples').hidden = !hasExamples;
-    $('reset-btn').textContent = resetArmed ? 'Click again to burn everything' : 'Burn the file';
+    setAct('reset-btn', 'flame', resetArmed ? 'Click again to burn everything' : 'Burn the file');
 
     if (focusSel) {
       var el = document.querySelector(focusSel);
       if (el) el.focus();
       focusSel = null;
+    }
+    if (scrollToDrawer && openDrawer) {
+      scrollToDrawer = false;
+      try { panel.scrollIntoView({ block: 'nearest' }); } catch (e) { /* ignore */ }
     }
   }
 
@@ -974,6 +1002,7 @@
     state.closed.push({ id: t.id, text: t.text, deadline: t.deadline, completedAt: new Date().toISOString(), example: !!t.example });
     state.tasks = state.tasks.filter(function (x) { return x.id !== id; });
     delete tipText[id];
+    if (openAmendId === id) openAmendId = null;
   }
 
   document.addEventListener('click', function (ev) {
@@ -983,9 +1012,23 @@
     var id = b.getAttribute('data-id');
     var t = id ? findTask(id) : null;
 
-    if (action === 'keep' && t) {
-      mark(t, 'Still holds');
-    } else if (action === 'demote' && t) {
+    if (action === 'meta') {
+      openMeta[id] = !openMeta[id];
+      render();
+      return;
+    }
+    if (action === 'drawer') {
+      openDrawer = openDrawer === id ? null : id;
+      scrollToDrawer = !!openDrawer;
+      render();
+      return;
+    }
+    if (action === 'cancel-amend') { openAmendId = null; render(); return; }
+    if (action === 'cancel-ledger') { openLedger = false; render(); return; }
+    if (action === 'ledger-open') { openLedger = true; focusSel = '#ledger-text'; render(); return; }
+    if (action === 'amend' && t) { openAmendId = id; focusSel = '#rw-text'; render(); return; }
+
+    if (action === 'demote' && t) {
       var was = t.importance;
       if (was > 1) {
         t.importance = was - 1;
@@ -994,22 +1037,12 @@
         mark(t, 'Pushed to the back');
       }
       t.createdAt = new Date().toISOString();
-    } else if (action === 'amend' && t) {
-      openAmendId = id;
-      focusSel = '#rw-text';
-    } else if (action === 'cancel-amend') {
-      openAmendId = null;
     } else if (action === 'redact' && t) {
       state.tasks = state.tasks.filter(function (x) { return x.id !== id; });
       delete tipText[id];
       openAmendId = null;
     } else if (action === 'complete' && t) {
       completeTask(id);
-    } else if (action === 'ledger-open') {
-      openLedger = true;
-      focusSel = '#ledger-text';
-    } else if (action === 'cancel-ledger') {
-      openLedger = false;
     } else {
       return;
     }
@@ -1027,14 +1060,15 @@
       state.tasks.push({
         id: uid(),
         text: text,
-        mood: $('f-mood').value,
-        importance: Number($('f-importance').value),
-        deadline: $('f-deadline').value || null,
+        mood: $('feeling-wrap').hidden ? '' : $('f-mood').value,
+        importance: $('urgency-wrap').hidden ? 2 : Number($('f-importance').value),
+        deadline: $('deadline-wrap').hidden ? null : ($('f-deadline').value || null),
         createdAt: new Date().toISOString(),
         marks: [],
         struck: []
       });
-      form.reset();
+      $('f-text').value = '';
+      ['feeling', 'urgency', 'deadline'].forEach(function (n) { setOpt(n, false); });
       saveState();
       render();
     } else if (form.hasAttribute('data-amend-id')) {
@@ -1065,18 +1099,41 @@
     }
   });
 
-  document.addEventListener('toggle', function (ev) {
-    var d = ev.target;
-    if (d && d.getAttribute && d.getAttribute('data-file-id')) {
-      openFiles[d.getAttribute('data-file-id')] = d.open;
-    }
-  }, true);
+  /* Quick add options: each control stays hidden until asked for, and resets after filing */
+  var OPTS = {
+    feeling: { open: '+ feeling', close: 'No feeling', reset: function () { $('f-mood').value = 'Calm'; } },
+    urgency: { open: '+ urgency', close: 'Default urgency', reset: function () { $('f-importance').value = '2'; } },
+    deadline: { open: '+ deadline', close: 'No deadline', reset: function () { $('f-deadline').value = ''; } }
+  };
+
+  function setOpt(name, show) {
+    $(name + '-wrap').hidden = !show;
+    var toggle = $(name + '-toggle');
+    toggle.setAttribute('aria-expanded', show ? 'true' : 'false');
+    toggle.textContent = show ? OPTS[name].close : OPTS[name].open;
+    if (!show) OPTS[name].reset();
+  }
+
+  Object.keys(OPTS).forEach(function (name) {
+    $(name + '-toggle').addEventListener('click', function () {
+      setOpt(name, $(name + '-wrap').hidden);
+    });
+  });
+
+  /* Menu */
+  function syncMenu() {
+    $('menu').hidden = !menuOpen;
+    $('menu-btn').setAttribute('aria-expanded', menuOpen ? 'true' : 'false');
+    setAct('menu-btn', menuOpen ? 'x' : 'menu', menuOpen ? 'Close' : 'Menu');
+  }
+  $('menu-btn').addEventListener('click', function () { menuOpen = !menuOpen; syncMenu(); });
 
   $('clear-examples').addEventListener('click', function () {
     state.tasks = state.tasks.filter(function (t) { return !t.example; });
     state.closed = state.closed.filter(function (c) { return !c.example; });
     state.ledger = state.ledger.filter(function (e) { return !e.example; });
     tipText = {};
+    openAmendId = null;
     saveState();
     render();
   });
@@ -1095,22 +1152,9 @@
     tipText = {};
     openAmendId = null;
     openLedger = false;
+    openDrawer = null;
     saveState();
     render();
-  });
-
-  /* Theme preview */
-  function effectiveTheme() {
-    var a = document.documentElement.getAttribute('data-theme');
-    if (a === 'dark' || a === 'light') return a;
-    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-  }
-  function syncThemeBtn() {
-    $('theme-btn').textContent = effectiveTheme() === 'dark' ? 'Day edition' : 'Night edition';
-  }
-  $('theme-btn').addEventListener('click', function () {
-    document.documentElement.setAttribute('data-theme', effectiveTheme() === 'dark' ? 'light' : 'dark');
-    syncThemeBtn();
   });
 
   /* Anonymous tip */
@@ -1222,11 +1266,13 @@
     $('view-main').hidden = about;
     $('view-about').hidden = !about;
     document.querySelector('.wrap').classList.toggle('on-about', about);
-    $('about-btn').textContent = about ? 'Back to the list' : 'About this tool';
+    setAct('about-btn', about ? 'back' : 'info', about ? 'Back to the list' : 'About this tool');
   }
 
   function goView(name) {
     applyView(name);
+    menuOpen = false;
+    syncMenu();
     window.scrollTo(0, 0);
     try { location.hash = name === 'about' ? 'about' : ''; } catch (e) { /* hash unavailable */ }
   }
@@ -1238,8 +1284,12 @@
     if (v !== currentView) { applyView(v); window.scrollTo(0, 0); }
   });
 
+  setAct('file-btn', 'enter', 'File it');
+  setAct('tip-again', 'refresh', 'New tip');
+  setAct('clear-examples', 'trash', 'Clear examples');
+  setAct('about-back', 'back', 'Back to the list');
   applyView(viewFromHash());
-  syncThemeBtn();
+  syncMenu();
   render();
   initSample();
 })();
