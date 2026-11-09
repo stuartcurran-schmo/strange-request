@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="An experimental to-do list built on structured procrastination. Every note is a message from a stranger you get to review.">
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Strange Request</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Chakra+Petch:wght@600;700&family=Courier+Prime:wght@400;700&family=Reenie+Beanie&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one narrow column, like a paperback page. A flat cover block with venetian-blind shadow
+     bars opens the page; notes are typed slips with the user's own edits added in a second pen.
+     Light is the yellowed paperback. Dark is cyber noir. Same structure, different skin. */
+  :root {
+    --bg: #DBC98F;
+    --slip: #E8DBAE;
+    --slip-dim: #DDCE9B;
+    --field: #F2E8C4;
+    --ink: #211B14;
+    --ink-soft: #574B33;
+    --rule: #A5926A;
+    --cover: #7A1C15;
+    --cover-ink: #F0E4BE;
+    --cover-soft: #E3C6AE;
+    --blind: rgba(28, 5, 3, 0.36);
+    --pen: #A81F17;
+    --primary: #7A1C15;
+    --on-primary: #F5EBC8;
+    --hover: rgba(33, 27, 20, 0.09);
+    --focus: #7A1C15;
+    --shadow: rgba(33, 27, 20, 0.24);
+    --title-shadow: 3px 3px 0 rgba(20, 4, 2, 0.4);
+    --track-on: #7A1C15;
+    --f-display: 'Alfa Slab One', Rockwell, Georgia, serif;
+    --f-type: 'Special Elite', 'Courier New', monospace;
+    --f-meta: 'Courier Prime', 'Courier New', monospace;
+    --f-hand: 'Reenie Beanie', 'Bradley Hand', cursive;
+    --h1-weight: 400;
+    --hand-size: 1.4rem;
+    --note-size: 1.2rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A0D14;
+      --slip: #111826;
+      --slip-dim: #0D121D;
+      --field: #0A0F19;
+      --ink: #D3DAE8;
+      --ink-soft: #8C98AE;
+      --rule: #27324A;
+      --cover: #0D1320;
+      --cover-ink: #EEF1F8;
+      --cover-soft: #9CA8BF;
+      --blind: rgba(255, 61, 139, 0.17);
+      --pen: #FF6FA8;
+      --primary: #FF3D8B;
+      --on-primary: #12060C;
+      --hover: rgba(255, 61, 139, 0.13);
+      --focus: #FF6FA8;
+      --shadow: rgba(0, 0, 0, 0.55);
+      --title-shadow: 0 0 22px rgba(255, 61, 139, 0.5);
+      --track-on: #FF3D8B;
+      --f-display: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+      --f-type: 'Share Tech Mono', 'Courier New', monospace;
+      --f-meta: 'Share Tech Mono', 'Courier New', monospace;
+      --f-hand: 'Share Tech Mono', 'Courier New', monospace;
+      --h1-weight: 700;
+      --hand-size: 0.95rem;
+      --note-size: 1.05rem;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0A0D14;
+    --slip: #111826;
+    --slip-dim: #0D121D;
+    --field: #0A0F19;
+    --ink: #D3DAE8;
+    --ink-soft: #8C98AE;
+    --rule: #27324A;
+    --cover: #0D1320;
+    --cover-ink: #EEF1F8;
+    --cover-soft: #9CA8BF;
+    --blind: rgba(255, 61, 139, 0.17);
+    --pen: #FF6FA8;
+    --primary: #FF3D8B;
+    --on-primary: #12060C;
+    --hover: rgba(255, 61, 139, 0.13);
+    --focus: #FF6FA8;
+    --shadow: rgba(0, 0, 0, 0.55);
+    --title-shadow: 0 0 22px rgba(255, 61, 139, 0.5);
+    --track-on: #FF3D8B;
+    --f-display: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+    --f-type: 'Share Tech Mono', 'Courier New', monospace;
+    --f-meta: 'Share Tech Mono', 'Courier New', monospace;
+    --f-hand: 'Share Tech Mono', 'Courier New', monospace;
+    --h1-weight: 700;
+    --hand-size: 0.95rem;
+    --note-size: 1.05rem;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--f-type);
+    font-size: 1rem;
+    line-height: 1.5;
+    padding-block: 28px 72px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .front { display: flex; flex-direction: column; gap: 14px; }
+
+  /* Cover */
+  .cover {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--cover);
+    color: var(--cover-ink);
+    padding: 22px 22px 28px;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .cover::before {
+    content: "";
+    position: absolute;
+    inset: -25% -10%;
+    z-index: -1;
+    background: repeating-linear-gradient(172deg, transparent 0 20px, var(--blind) 20px 38px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.15) 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.15) 100%);
+  }
+  .cover-meta {
+    margin: 0;
+    font-family: var(--f-meta);
+    font-size: 0.82rem;
+    color: var(--cover-soft);
+  }
+  .cover h1 {
+    margin: 0;
+    font-family: var(--f-display);
+    font-weight: var(--h1-weight);
+    font-size: clamp(2.7rem, 12vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    text-shadow: var(--title-shadow);
+  }
+  .cover-line {
+    margin: 0;
+    max-width: 38ch;
+    font-size: 1rem;
+    color: var(--cover-ink);
+  }
+
+  /* Control bar */
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+  .tip-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    min-width: 0;
+  }
+  .bar-label {
+    font-family: var(--f-meta);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    min-width: 0;
+  }
+  .bar-label strong { color: var(--ink); }
+
+  .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex: none; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+  .switch .track {
+    position: absolute;
+    inset: 0;
+    background: var(--slip-dim);
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 24px;
+  }
+  .switch .track::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: var(--ink-soft);
+    transition: transform 0.15s;
+  }
+  .switch input:checked + .track { background: var(--track-on); border-color: var(--track-on); }
+  .switch input:checked + .track::before { transform: translateX(18px); background: var(--on-primary); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .status {
+    margin: 0;
+    font-family: var(--f-meta);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+
+  /* Headings */
+  h2 {
+    margin: 0 0 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--ink);
+    font-family: var(--f-meta);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  .section-note {
+    margin: -6px 0 14px;
+    font-family: var(--f-meta);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  /* Slips */
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+
+  .slip {
+    background: var(--slip);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    box-shadow: 0 2px 0 var(--shadow);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .slip.dim { background: var(--slip-dim); }
+  .slip.dim .note-text { color: var(--ink-soft); }
+
+  .tag {
+    align-self: flex-start;
+    font-family: var(--f-meta);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border: 1.5px solid var(--pen);
+    color: var(--pen);
+  }
+  .tag.herring {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+  }
+
+  .note-text {
+    margin: 0;
+    font-size: var(--note-size);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .struck {
+    margin: 0;
+    font-size: 0.98rem;
+    color: var(--ink-soft);
+    text-decoration: line-through;
+    text-decoration-color: var(--pen);
+    text-decoration-thickness: 2px;
+    overflow-wrap: anywhere;
+  }
+  .hand {
+    margin: 0;
+    font-family: var(--f-hand);
+    font-size: var(--hand-size);
+    line-height: 1.15;
+    color: var(--pen);
+  }
+  .meta {
+    margin: 0;
+    font-family: var(--f-meta);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .meta .flag { color: var(--pen); font-weight: 700; }
+
+  .helper {
+    margin: -4px 0 0;
+    font-family: var(--f-meta);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .empty {
+    margin: 0;
+    font-family: var(--f-meta);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  .shimmer {
+    display: inline-block;
+    width: 60%;
+    height: 1em;
+    vertical-align: middle;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--slip-dim) 25%, var(--rule) 50%, var(--slip-dim) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer { animation: none; }
+    .switch .track::before { transition: none; }
+  }
+
+  /* Buttons */
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn {
+    font-family: var(--f-meta);
+    font-size: 0.88rem;
+    font-weight: 700;
+    min-height: 36px;
+    padding: 6px 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--hover); }
+  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+  .btn.primary:hover { filter: brightness(1.12); }
+  .btn.ghost { border-color: var(--rule); color: var(--ink-soft); }
+  .btn.redact { background: var(--ink); border-color: var(--ink); color: var(--slip); }
+  .btn.small { min-height: 30px; padding: 3px 10px; font-size: 0.8rem; }
+
+  /* Forms */
+  label {
+    display: block;
+    font-family: var(--f-meta);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  input[type="text"], input[type="date"], select {
+    width: 100%;
+    min-width: 0;
+    font-family: var(--f-type);
+    font-size: 1rem;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--field);
+    color: var(--ink);
+  }
+  input:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .field { flex: 1 1 150px; min-width: 0; }
+  .inline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .inline input { flex: 1 1 200px; }
+  .amend { border-top: 1px dashed var(--rule); padding-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* File rows */
+  details.slip { padding: 0; gap: 0; }
+  details.slip summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 13px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  details.slip summary::-webkit-details-marker { display: none; }
+  details.slip summary:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .file-title { overflow-wrap: anywhere; min-width: 0; }
+  .file-age { font-family: var(--f-meta); font-size: 0.78rem; color: var(--ink-soft); white-space: nowrap; }
+  .file-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* Case notes */
+  .stat {
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    font-family: var(--f-meta);
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    background: var(--slip);
+    border: 1px solid var(--rule);
+  }
+  .entry { padding: 10px 0; border-top: 1px dashed var(--rule); overflow-wrap: anywhere; }
+  .entry:first-child { border-top: none; padding-top: 0; }
+  .entry .meta { margin-top: 2px; }
+
+  footer { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* Views */
+  .view { display: flex; flex-direction: column; gap: 30px; }
+  .bar-right { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+  .on-about .tip-group, .on-about .status { display: none; }
+
+  /* About */
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 62ch;
+    font-family: var(--f-meta);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .prose p { margin: 0; }
+  .prose .about-lead {
+    font-family: var(--f-type);
+    font-size: calc(var(--note-size) + 0.08rem);
+    line-height: 1.4;
+    max-width: 40ch;
+  }
+  .view a, .prose a { color: var(--pen); text-underline-offset: 2px; }
+  .view a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .map { margin: 0; display: flex; flex-direction: column; }
+  .map-row {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 4px 20px;
+    padding: 14px 0;
+    border-top: 1px dashed var(--rule);
+  }
+  .map-row:first-child { border-top: none; padding-top: 0; }
+  .map dt { font-family: var(--f-type); font-size: 1.02rem; line-height: 1.3; }
+  .map dd { margin: 0; max-width: 58ch; font-family: var(--f-meta); line-height: 1.6; }
+  @media (max-width: 560px) {
+    .map-row { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .caveat {
+    margin: 0;
+    padding: 14px 16px;
+    max-width: 62ch;
+    font-family: var(--f-meta);
+    line-height: 1.6;
+    background: var(--slip);
+    border: 1px solid var(--rule);
+  }
+
+  .refs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 62ch;
+    font-family: var(--f-meta);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .refs li { padding-left: 1.4em; text-indent: -1.4em; overflow-wrap: anywhere; }
+</style>
+
+</head>
+<body>
+<main class="wrap">
+
+  <div class="front">
+    <header class="cover">
+      <p class="cover-meta" id="cover-meta"></p>
+      <h1>Strange Request</h1>
+      <p class="cover-line">A list left behind by whoever you were last week. Keep it, change it, or find something easier to do.</p>
+    </header>
+
+    <div class="bar">
+      <div class="tip-group" id="tip-controls" hidden>
+        <label class="switch" for="tip-toggle">
+          <input type="checkbox" id="tip-toggle" aria-label="Anonymous tip">
+          <span class="track"></span>
+        </label>
+        <span class="bar-label"><strong>Anonymous tip.</strong> A stranger rewords every note. Meaning stays the same.</span>
+        <button type="button" class="btn ghost small" id="tip-again" hidden>New tip</button>
+      </div>
+      <div class="bar-right">
+        <button type="button" class="btn ghost small" id="about-btn">About this tool</button>
+        <button type="button" class="btn ghost small" id="theme-btn">Night edition</button>
+      </div>
+    </div>
+    <p class="status" id="status" hidden></p>
+  </div>
+
+  <div class="view" id="view-main">
+
+  <section aria-labelledby="h-add">
+    <h2 id="h-add">Leave a note</h2>
+    <form class="slip" id="add-form">
+      <div>
+        <label for="f-text">What does it say?</label>
+        <input type="text" id="f-text" placeholder="Call Dave about the van" maxlength="140" autocomplete="off" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="f-mood">Mood when written</label>
+          <select id="f-mood">
+            <option>Calm</option>
+            <option>Rushed</option>
+            <option>Anxious</option>
+            <option>Optimistic</option>
+            <option>Knackered</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-importance">How urgent it felt</label>
+          <select id="f-importance">
+            <option value="3">Extremely</option>
+            <option value="2" selected>Fairly</option>
+            <option value="1">Mildly</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-deadline">Deadline they gave</label>
+          <input type="date" id="f-deadline">
+        </div>
+      </div>
+      <div class="actions"><button type="submit" class="btn primary">File it</button></div>
+    </form>
+  </section>
+
+  <section aria-labelledby="h-desk">
+    <h2 id="h-desk">On the desk</h2>
+    <div class="stack" id="desk"></div>
+  </section>
+
+  <section aria-labelledby="h-file">
+    <h2 id="h-file">In the file</h2>
+    <p class="section-note">Everything else the stranger left, most urgent first.</p>
+    <div class="stack" id="file-list"></div>
+  </section>
+
+  <section aria-labelledby="h-cases">
+    <h2 id="h-cases">Case notes</h2>
+    <p class="stat" id="stat"></p>
+    <div id="ledger-list"></div>
+  </section>
+
+  <footer>
+    <button type="button" class="btn ghost small" id="clear-examples" hidden>Clear examples</button>
+    <button type="button" class="btn ghost small" id="reset-btn">Burn the file</button>
+  </footer>
+
+  </div>
+
+  <div class="view" id="view-about" hidden>
+
+    <section aria-labelledby="a-what">
+      <h2 id="a-what">What this is</h2>
+      <div class="prose">
+        <p class="about-lead">A to-do list that assumes you cannot fully trust a plan your earlier self made.</p>
+        <p>Strange Request is an experimental to-do list. It starts from John Perry's essay on <a href="https://structuredprocrastination.com/" target="_blank" rel="noopener noreferrer">structured procrastination</a>, which suggests that people who put things off can still get a great deal done. The trick is to keep one important task at the top of the list and do everything else as a way of avoiding it. This version keeps that joke and builds its mechanics on findings from procrastination research.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="a-stranger">
+      <h2 id="a-stranger">Notes from a stranger</h2>
+      <div class="prose">
+        <p>Every note on the list was written earlier, in some mood, with a guess about how today would go. Research on the future self, associated with Hal Hershfield and drawing on the philosopher Derek Parfit, finds that people tend to think about their future self in ways that resemble thinking about another person. A weaker sense of connection to that person goes with a preference for smaller, sooner rewards.</p>
+        <p>If that is roughly right, a plan is a promise made on someone else's behalf. The list keeps that in view. Each note shows who wrote it, how they felt and how urgent they thought it was. You review each note before acting on it, the way you would check a list you found.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="a-parts">
+      <h2 id="a-parts">How each part works</h2>
+      <dl class="map">
+        <div class="map-row">
+          <dt>Mood and urgency on each note</dt>
+          <dd>You record how you felt and how urgent the note seemed when you wrote it. Plans tend to be made in a calm, abstract state and carried out in a tired or tempted one. George Loewenstein called this the hot-cold empathy gap. With the mood shown beside the note, today's you can discount it.</dd>
+        </div>
+        <div class="map-row">
+          <dt>Deadlines and the score line</dt>
+          <dd>People underestimate how long tasks take, even when similar tasks ran late before. Daniel Kahneman and Amos Tversky named this the planning fallacy. When you finish a note that had a deadline, the line under Case notes compares the deadline with the day you finished, so you build a record of how reliable those deadlines are.</dd>
+        </div>
+        <div class="map-row">
+          <dt>Still open and red herring</dt>
+          <dd>This is Perry's trick made visible. Your most urgent note stays at the top, dimmed. The next one is promoted as the red herring, the thing to do first. Piers Steel's temporal motivation theory says we put off tasks whose payoff is distant or whose effort is unpleasant, and drift to whatever is nearer and easier. The desk uses that drift.</dd>
+        </div>
+        <div class="map-row">
+          <dt>Keep, Push down, Amend</dt>
+          <dd>Keep says the plan still holds. Push down admits it is not happening today and does not delete it. Amend rewrites the note and leaves the old wording struck through, so the change stays visible. George Ainslie's work on hyperbolic discounting suggests our preferences shift as the moment of action gets close, so your earlier and later selves can disagree sincerely. These controls let you renegotiate with them.</dd>
+        </div>
+        <div class="map-row">
+          <dt>Case notes</dt>
+          <dd>Anything you finish that is not the top note is logged as work done instead of the top job. You can also add entries by hand. Perry argues that this kind of avoidance can be productive. The log lets you check whether that holds for you, and whether the notes you keep pushing down ever mattered.</dd>
+        </div>
+        <div class="map-row">
+          <dt>Anonymous tip</dt>
+          <dd>An optional switch that asks Claude to reword every note as if a different person had written it. Your own wording stays underneath. This one is a hunch more than a research finding. Seeing a note in unfamiliar words may loosen your attachment to the first version, and it makes the list read like something you found.<span id="tip-note" hidden> The switch only appears where the page can reach Claude. If you do not see it, it is not available in this copy.</span></dd>
+        </div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="a-research">
+      <h2 id="a-research">What the research says</h2>
+      <div class="prose">
+        <p>Most researchers treat procrastination as a failure of self-regulation and not as a time-management problem. Steel's 2007 meta-analysis found the strongest links to task aversiveness, low confidence in one's ability to do the task, impulsiveness and low conscientiousness. Fuschia Sirois and Timothy Pychyl describe procrastination as putting short-term mood repair ahead of the long-term interests of the future self.</p>
+        <p>This tool leans on that mainstream work. It makes no claims about trauma or clinical conditions.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="a-limits">
+      <h2 id="a-limits">What it does not claim</h2>
+      <p class="caveat">Nobody has tested whether this arrangement reduces procrastination. The link between each feature and its source is design reasoning, and the research behind each idea describes general tendencies, not what will work for you. This is a toy and an experiment. It is not therapy and not a clinical tool. If procrastination is causing you real difficulty, a professional can help in ways a to-do list cannot.</p>
+    </section>
+
+    <section aria-labelledby="a-data">
+      <h2 id="a-data">Your data</h2>
+      <div class="prose">
+        <p>Notes, case notes and your edits are saved in this browser, on this device, and are not uploaded anywhere. Clearing your browser data erases them. If you switch on Anonymous tip, the text of your notes is sent to Claude to be reworded. That uses your own Claude usage, and the page asks your permission first.</p>
+        <p>The four example notes are samples. Clear examples removes them.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="a-reading">
+      <h2 id="a-reading">Reading</h2>
+      <p class="section-note">The ideas above come from these sources. Check the originals before quoting any detail.</p>
+      <ul class="refs">
+        <li>Perry, J. Structured procrastination. <a href="https://structuredprocrastination.com/" target="_blank" rel="noopener noreferrer">structuredprocrastination.com</a></li>
+        <li>Steel, P. (2007). The nature of procrastination: a meta-analytic and theoretical review of quintessential self-regulatory failure. Psychological Bulletin.</li>
+        <li>Sirois, F. and Pychyl, T. (2013). Procrastination and the priority of short-term mood regulation. Social and Personality Psychology Compass.</li>
+        <li>Ainslie, G. (1975). Specious reward: a behavioral theory of impulsiveness and impulse control. Psychological Bulletin.</li>
+        <li>Buehler, R., Griffin, D. and Ross, M. (1994). Exploring the "planning fallacy". Journal of Personality and Social Psychology.</li>
+        <li>Loewenstein, G. (1996). Out of control: visceral influences on behavior. Organizational Behavior and Human Decision Processes.</li>
+        <li>Hershfield, H. (2011). Future self-continuity: how conceptions of the future self transform intertemporal choice. Annals of the New York Academy of Sciences.</li>
+        <li>Parfit, D. (1984). Reasons and Persons. Oxford University Press.</li>
+      </ul>
+    </section>
+
+    <div class="actions"><button type="button" class="btn" id="about-back">Back to the list</button></div>
+
+  </div>
+
+</main>
+
+<script>
+(function () {
+  var STORE_KEY = 'strange-request-v1';
+  var DAY = 86400000;
+
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function isoAgo(d) { return new Date(Date.now() - d * DAY).toISOString(); }
+  function dateIn(d) {
+    var x = new Date(Date.now() + d * DAY);
+    return x.getFullYear() + '-' + pad(x.getMonth() + 1) + '-' + pad(x.getDate());
+  }
+
+  function seed() {
+    return {
+      tasks: [
+        { id: uid(), text: 'Finish the Q3 report', mood: 'Anxious', importance: 3, deadline: dateIn(-2), createdAt: isoAgo(9), marks: [], struck: [], example: true },
+        { id: uid(), text: 'Book the dentist', mood: 'Calm', importance: 2, deadline: null, createdAt: isoAgo(6), marks: [], struck: [], example: true },
+        { id: uid(), text: 'Reply to Sam about the venue', mood: 'Rushed', importance: 2, deadline: dateIn(1), createdAt: isoAgo(3), marks: [], struck: [], example: true },
+        { id: uid(), text: 'Sort out the shed', mood: 'Optimistic', importance: 1, deadline: dateIn(5), createdAt: isoAgo(12), marks: [], struck: [], example: true }
+      ],
+      closed: [
+        { id: uid(), text: 'Renew the car insurance', deadline: dateIn(-6), completedAt: isoAgo(3), example: true }
+      ],
+      ledger: [
+        { id: uid(), dodged: 'Finish the Q3 report', done: 'Reorganised the spice rack', timestamp: isoAgo(1), example: true }
+      ]
+    };
+  }
+
+  function loadState() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { raw = null; }
+    if (!raw) return seed();
+    try {
+      var p = JSON.parse(raw);
+      var tasks = (p.tasks || []).map(function (t) {
+        t.marks = t.marks || [];
+        t.struck = t.struck || [];
+        return t;
+      });
+      return { tasks: tasks, closed: p.closed || [], ledger: p.ledger || [] };
+    } catch (e) {
+      return seed();
+    }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* in-memory only */ }
+  }
+
+  var state = loadState();
+
+  var sampleFn = null;
+  var tipMode = false;
+  var tipLoading = false;
+  var tipText = {};
+  var transient = '';
+  var transientTimer = null;
+  var openAmendId = null;
+  var openLedger = false;
+  var openFiles = {};
+  var focusSel = null;
+  var resetArmed = false;
+  var resetTimer = null;
+
+  var MOOD = { Calm: 'calm', Rushed: 'in a rush', Anxious: 'anxious', Optimistic: 'feeling optimistic', Knackered: 'knackered' };
+  var URG = { 3: 'extremely urgent', 2: 'fairly urgent', 1: 'only mildly urgent' };
+  var URG_SHORT = { 3: 'extremely urgent', 2: 'fairly urgent', 1: 'mildly urgent' };
+
+  function $(id) { return document.getElementById(id); }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function daysAgo(iso) {
+    var d = Math.floor((Date.now() - new Date(iso).getTime()) / DAY);
+    if (d <= 0) return 'today';
+    if (d === 1) return 'yesterday';
+    return d + ' days ago';
+  }
+
+  function fmtDate(s) {
+    var d = new Date(s + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  function isOverdue(t) {
+    return !!t.deadline && new Date(t.deadline + 'T23:59:59').getTime() < Date.now();
+  }
+
+  function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
+
+  function sortedTasks() {
+    return state.tasks.slice().sort(function (a, b) {
+      if (b.importance !== a.importance) return b.importance - a.importance;
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    });
+  }
+
+  function findTask(id) {
+    for (var i = 0; i < state.tasks.length; i++) if (state.tasks[i].id === id) return state.tasks[i];
+    return null;
+  }
+
+  function displayText(t) {
+    if (tipLoading) return '<span class="shimmer">&nbsp;</span>';
+    if (tipMode && tipText[t.id]) return escapeHTML(tipText[t.id]);
+    return escapeHTML(t.text);
+  }
+
+  function metaLine(t) {
+    var s = 'Typed by a stranger who was ' + MOOD[t.mood] + ', ' + daysAgo(t.createdAt) + '. They thought it was ' + URG[t.importance] + '.';
+    if (t.deadline) {
+      s += ' Deadline given: ' + fmtDate(t.deadline);
+      s += isOverdue(t) ? ' <span class="flag">(passed)</span>.' : '.';
+    }
+    if (t.example) s += ' Example note.';
+    return s;
+  }
+
+  function btn(action, id, label, cls) {
+    return '<button type="button" class="btn' + (cls ? ' ' + cls : '') + '" data-action="' + action + '" data-id="' + id + '">' + label + '</button>';
+  }
+
+  function select(cls, options, selected) {
+    return '<select class="' + cls + '">' + options.map(function (o) {
+      return '<option value="' + o[0] + '"' + (String(o[0]) === String(selected) ? ' selected' : '') + '>' + o[1] + '</option>';
+    }).join('') + '</select>';
+  }
+
+  function amendFormHTML(t) {
+    var moods = ['Calm', 'Rushed', 'Anxious', 'Optimistic', 'Knackered'].map(function (m) { return [m, m]; });
+    var urg = [[3, 'Extremely'], [2, 'Fairly'], [1, 'Mildly']];
+    return (
+      '<form class="amend" data-amend-id="' + t.id + '">' +
+        '<div><label for="rw-text">Amend the note</label>' +
+        '<input type="text" id="rw-text" class="rw-text" value="' + escapeHTML(t.text) + '" maxlength="140" autocomplete="off"></div>' +
+        '<div class="row">' +
+          '<div class="field"><label>Mood when written</label>' + select('rw-mood', moods, t.mood) + '</div>' +
+          '<div class="field"><label>How urgent now</label>' + select('rw-importance', urg, t.importance) + '</div>' +
+          '<div class="field"><label>Deadline</label><input type="date" class="rw-deadline" value="' + (t.deadline || '') + '"></div>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<button type="submit" class="btn primary small">Save amendment</button>' +
+          '<button type="button" class="btn small" data-action="cancel-amend">Cancel</button>' +
+          btn('redact', t.id, 'Redact', 'redact small') +
+        '</div>' +
+      '</form>'
+    );
+  }
+
+  function ledgerFormHTML() {
+    return (
+      '<form class="inline" data-ledger-form="1">' +
+        '<label class="sr" for="ledger-text">What did you do instead?</label>' +
+        '<input type="text" id="ledger-text" placeholder="What did you do instead?" maxlength="140" autocomplete="off" required>' +
+        '<button type="submit" class="btn primary small">Add to case notes</button>' +
+        '<button type="button" class="btn small" data-action="cancel-ledger">Cancel</button>' +
+      '</form>'
+    );
+  }
+
+  function slipHTML(t, role) {
+    var tag = role === 'top' ? '<span class="tag">Still open</span>' : '<span class="tag herring">Red herring</span>';
+    var struck = (t.struck || []).slice(-2).map(function (s) { return '<p class="struck">' + escapeHTML(s) + '</p>'; }).join('');
+    var marks = (t.marks || []).slice(-2).map(function (m) { return '<p class="hand">' + escapeHTML(m.t) + ' (' + daysAgo(m.at) + ')</p>'; }).join('');
+    var actions;
+    if (role === 'top') {
+      actions = btn('keep', t.id, 'Keep') + btn('demote', t.id, 'Push down') + btn('amend', t.id, 'Amend') +
+        btn('ledger-open', t.id, 'Did something else', 'ghost') + btn('complete', t.id, 'Done', 'primary');
+    } else {
+      actions = btn('complete', t.id, 'Done', 'primary') + btn('amend', t.id, 'Amend');
+    }
+    return (
+      '<article class="slip' + (role === 'top' ? ' dim' : '') + '">' +
+        tag +
+        struck +
+        '<p class="note-text">' + displayText(t) + '</p>' +
+        marks +
+        '<p class="meta">' + metaLine(t) + '</p>' +
+        '<div class="actions">' + actions + '</div>' +
+        (role === 'top' && openLedger ? ledgerFormHTML() : '') +
+        (openAmendId === t.id ? amendFormHTML(t) : '') +
+      '</article>'
+    );
+  }
+
+  function fileRowHTML(t) {
+    var struck = (t.struck || []).slice(-2).map(function (s) { return '<p class="struck">' + escapeHTML(s) + '</p>'; }).join('');
+    var marks = (t.marks || []).slice(-2).map(function (m) { return '<p class="hand">' + escapeHTML(m.t) + ' (' + daysAgo(m.at) + ')</p>'; }).join('');
+    return (
+      '<details class="slip" data-file-id="' + t.id + '"' + (openFiles[t.id] || openAmendId === t.id ? ' open' : '') + '>' +
+        '<summary><span class="file-title">' + displayText(t) + '</span><span class="file-age">' + daysAgo(t.createdAt) + '</span></summary>' +
+        '<div class="file-body">' +
+          struck + marks +
+          '<p class="meta">' + metaLine(t) + '</p>' +
+          '<div class="actions">' +
+            btn('keep', t.id, 'Keep') + btn('demote', t.id, 'Push down') + btn('amend', t.id, 'Amend') + btn('complete', t.id, 'Done', 'primary') +
+          '</div>' +
+          (openAmendId === t.id ? amendFormHTML(t) : '') +
+        '</div>' +
+      '</details>'
+    );
+  }
+
+  function computeStat() {
+    var withDeadline = state.closed.filter(function (c) { return c.deadline; });
+    if (!withDeadline.length) {
+      return 'No finished notes with a deadline yet. Finish one and this line starts keeping score on the stranger.';
+    }
+    var total = 0;
+    withDeadline.forEach(function (c) {
+      total += (new Date(c.completedAt).getTime() - new Date(c.deadline + 'T23:59:59').getTime()) / DAY;
+    });
+    var avg = total / withDeadline.length;
+    var n = withDeadline.length;
+    var mag = Math.abs(avg).toFixed(1);
+    var unit = mag === '1.0' ? 'day' : 'days';
+    var scope = 'Across ' + plural(n, 'finished note') + ' with a deadline, ';
+    if (avg > 0.5) return scope + 'the stranger’s deadlines ran optimistic by ' + mag + ' ' + unit + ' on average. Treat the next one with suspicion.';
+    if (avg < -0.5) return scope + 'you beat the stranger’s deadlines by ' + mag + ' ' + unit + ' on average. Suspiciously organised.';
+    return scope + 'the stranger’s deadlines were about right. That is rare.';
+  }
+
+  function render() {
+    var sorted = sortedTasks();
+
+    var desk = $('desk');
+    var fileEl = $('file-list');
+    if (!sorted.length) {
+      desk.innerHTML = '<p class="empty">Nothing on file. Leave a note above. With two notes, the desk shows your top job and a red herring to do first.</p>';
+      fileEl.innerHTML = '<p class="empty">The file is empty.</p>';
+    } else {
+      var html = slipHTML(sorted[0], 'top');
+      html += '<p class="helper">Keep leaves it where it is. Push down does not delete it, it admits it is not happening today.</p>';
+      if (sorted.length > 1) {
+        html += slipHTML(sorted[1], 'herring');
+      } else {
+        html += '<p class="empty">One note on file, so there is nothing to hide behind yet. Add a second and the desk picks a red herring.</p>';
+      }
+      desk.innerHTML = html;
+
+      var rest = sorted.slice(2);
+      fileEl.innerHTML = rest.length ? rest.map(fileRowHTML).join('') : '<p class="empty">Nothing else in the file.</p>';
+    }
+
+    var overdue = state.tasks.filter(isOverdue).length;
+    $('cover-meta').textContent = state.tasks.length
+      ? plural(state.tasks.length, 'note') + ' on file. ' + overdue + ' past their deadline.'
+      : 'No notes on file.';
+
+    $('stat').textContent = computeStat();
+
+    var led = $('ledger-list');
+    if (!state.ledger.length) {
+      led.innerHTML = '<p class="empty">Nothing yet. Finish a note that is not the top job, or log what you did instead, and it lands here.</p>';
+    } else {
+      led.innerHTML = state.ledger.map(function (e) {
+        return '<div class="entry"><span>Instead of <em>' + escapeHTML(e.dodged) + '</em>: ' + escapeHTML(e.done) + '</span>' +
+          '<p class="meta">' + daysAgo(e.timestamp) + (e.example ? '. Example entry.' : '') + '</p></div>';
+      }).join('');
+    }
+
+    var hasExamples = state.tasks.some(function (t) { return t.example; }) ||
+      state.closed.some(function (c) { return c.example; }) ||
+      state.ledger.some(function (e) { return e.example; });
+    $('clear-examples').hidden = !hasExamples;
+    $('reset-btn').textContent = resetArmed ? 'Click again to burn everything' : 'Burn the file';
+
+    if (focusSel) {
+      var el = document.querySelector(focusSel);
+      if (el) el.focus();
+      focusSel = null;
+    }
+  }
+
+  /* Actions */
+  function mark(t, text) {
+    t.marks = (t.marks || []).concat([{ t: text, at: new Date().toISOString() }]);
+  }
+
+  function addLedger(dodged, done) {
+    state.ledger.unshift({ id: uid(), dodged: dodged, done: done, timestamp: new Date().toISOString() });
+  }
+
+  function completeTask(id) {
+    var t = findTask(id);
+    if (!t) return;
+    var sorted = sortedTasks();
+    if (sorted.length > 1 && sorted[0].id !== id) {
+      addLedger(sorted[0].text, t.text);
+    }
+    state.closed.push({ id: t.id, text: t.text, deadline: t.deadline, completedAt: new Date().toISOString(), example: !!t.example });
+    state.tasks = state.tasks.filter(function (x) { return x.id !== id; });
+    delete tipText[id];
+  }
+
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]');
+    if (!b) return;
+    var action = b.getAttribute('data-action');
+    var id = b.getAttribute('data-id');
+    var t = id ? findTask(id) : null;
+
+    if (action === 'keep' && t) {
+      mark(t, 'Still holds');
+    } else if (action === 'demote' && t) {
+      var was = t.importance;
+      if (was > 1) {
+        t.importance = was - 1;
+        mark(t, 'Pushed down from ' + URG_SHORT[was]);
+      } else {
+        mark(t, 'Pushed to the back');
+      }
+      t.createdAt = new Date().toISOString();
+    } else if (action === 'amend' && t) {
+      openAmendId = id;
+      focusSel = '#rw-text';
+    } else if (action === 'cancel-amend') {
+      openAmendId = null;
+    } else if (action === 'redact' && t) {
+      state.tasks = state.tasks.filter(function (x) { return x.id !== id; });
+      delete tipText[id];
+      openAmendId = null;
+    } else if (action === 'complete' && t) {
+      completeTask(id);
+    } else if (action === 'ledger-open') {
+      openLedger = true;
+      focusSel = '#ledger-text';
+    } else if (action === 'cancel-ledger') {
+      openLedger = false;
+    } else {
+      return;
+    }
+    saveState();
+    render();
+  });
+
+  document.addEventListener('submit', function (ev) {
+    var form = ev.target;
+    ev.preventDefault();
+
+    if (form.id === 'add-form') {
+      var text = $('f-text').value.trim();
+      if (!text) return;
+      state.tasks.push({
+        id: uid(),
+        text: text,
+        mood: $('f-mood').value,
+        importance: Number($('f-importance').value),
+        deadline: $('f-deadline').value || null,
+        createdAt: new Date().toISOString(),
+        marks: [],
+        struck: []
+      });
+      form.reset();
+      saveState();
+      render();
+    } else if (form.hasAttribute('data-amend-id')) {
+      var t = findTask(form.getAttribute('data-amend-id'));
+      if (!t) return;
+      var newText = form.querySelector('.rw-text').value.trim() || t.text;
+      if (newText !== t.text) {
+        t.struck = (t.struck || []).concat([t.text]);
+        t.text = newText;
+        delete tipText[t.id];
+      }
+      t.mood = form.querySelector('.rw-mood').value;
+      t.importance = Number(form.querySelector('.rw-importance').value);
+      t.deadline = form.querySelector('.rw-deadline').value || null;
+      mark(t, 'Amended');
+      openAmendId = null;
+      saveState();
+      render();
+    } else if (form.hasAttribute('data-ledger-form')) {
+      var input = $('ledger-text');
+      var top = sortedTasks()[0];
+      if (input && input.value.trim() && top) {
+        addLedger(top.text, input.value.trim());
+        openLedger = false;
+        saveState();
+        render();
+      }
+    }
+  });
+
+  document.addEventListener('toggle', function (ev) {
+    var d = ev.target;
+    if (d && d.getAttribute && d.getAttribute('data-file-id')) {
+      openFiles[d.getAttribute('data-file-id')] = d.open;
+    }
+  }, true);
+
+  $('clear-examples').addEventListener('click', function () {
+    state.tasks = state.tasks.filter(function (t) { return !t.example; });
+    state.closed = state.closed.filter(function (c) { return !c.example; });
+    state.ledger = state.ledger.filter(function (e) { return !e.example; });
+    tipText = {};
+    saveState();
+    render();
+  });
+
+  $('reset-btn').addEventListener('click', function () {
+    if (!resetArmed) {
+      resetArmed = true;
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () { resetArmed = false; render(); }, 4000);
+      render();
+      return;
+    }
+    clearTimeout(resetTimer);
+    resetArmed = false;
+    state = { tasks: [], closed: [], ledger: [] };
+    tipText = {};
+    openAmendId = null;
+    openLedger = false;
+    saveState();
+    render();
+  });
+
+  /* Theme preview */
+  function effectiveTheme() {
+    var a = document.documentElement.getAttribute('data-theme');
+    if (a === 'dark' || a === 'light') return a;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  function syncThemeBtn() {
+    $('theme-btn').textContent = effectiveTheme() === 'dark' ? 'Day edition' : 'Night edition';
+  }
+  $('theme-btn').addEventListener('click', function () {
+    document.documentElement.setAttribute('data-theme', effectiveTheme() === 'dark' ? 'light' : 'dark');
+    syncThemeBtn();
+  });
+
+  /* Anonymous tip */
+  function refreshStatus() {
+    var msg = transient;
+    if (!msg) {
+      if (tipLoading) msg = 'Rewording the notes.';
+      else if (tipMode) msg = 'Showing an anonymous tip. Your own wording is untouched.';
+    }
+    $('status').textContent = msg;
+    $('status').hidden = !msg;
+  }
+
+  function flash(msg) {
+    transient = msg;
+    refreshStatus();
+    clearTimeout(transientTimer);
+    transientTimer = setTimeout(function () { transient = ''; refreshStatus(); }, 4500);
+  }
+
+  function tipOff() {
+    tipMode = false;
+    tipLoading = false;
+    $('tip-toggle').checked = false;
+    $('tip-again').hidden = true;
+  }
+
+  function requestTip() {
+    if (!sampleFn) return;
+    if (!state.tasks.length) {
+      tipOff();
+      flash('No notes to reword yet.');
+      render();
+      return;
+    }
+    tipLoading = true;
+    refreshStatus();
+    render();
+
+    var payload = state.tasks.map(function (t) { return { id: t.id, text: t.text }; });
+    var prompt = 'These are items from a to-do list. Rewrite each one as if a different stranger had jotted down the same item in their own words. ' +
+      'Keep the action, the subject and every concrete detail exactly the same: add nothing and drop nothing. Change only the phrasing, and make the voice noticeably different from the original. ' +
+      'Keep each item terse like a real list item, under 12 words, with no quotation marks. ' +
+      'Reply with only a JSON array of {"id": "...", "text": "..."} objects, one per item, using the same ids.\n\nItems:\n' + JSON.stringify(payload);
+
+    sampleFn.json(prompt, { modelTier: 'quick', cache: false }).then(function (data) {
+      tipLoading = false;
+      if (!tipMode) { refreshStatus(); render(); return; }
+      tipText = {};
+      if (Array.isArray(data)) {
+        data.forEach(function (item) {
+          if (item && item.id && item.text) tipText[item.id] = String(item.text);
+        });
+      }
+      refreshStatus();
+      render();
+    }).catch(function (e) {
+      var code = e && e.code;
+      tipOff();
+      if (code === 'cancelled') {
+        // nothing to say
+      } else if (code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared' || code === 'capability_disabled' || code === 'capability_removed') {
+        sampleFn = null;
+        $('tip-controls').hidden = true;
+        $('tip-note').hidden = false;
+      } else if (code === 'rate_limited') {
+        flash('Too many requests at once. Try again shortly.');
+      } else {
+        flash('Could not reword the notes just now.');
+      }
+      refreshStatus();
+      render();
+    });
+  }
+
+  $('tip-toggle').addEventListener('change', function (ev) {
+    tipMode = ev.target.checked;
+    $('tip-again').hidden = !tipMode;
+    if (tipMode) {
+      requestTip();
+    } else {
+      tipLoading = false;
+      refreshStatus();
+      render();
+    }
+  });
+
+  $('tip-again').addEventListener('click', function () { requestTip(); });
+
+  function initSample() {
+    if (!window.claude || !window.claude.use) { $('tip-note').hidden = false; return; }
+    window.claude.use('sample').then(function (s) {
+      sampleFn = s;
+      if (s) $('tip-controls').hidden = false;
+      else $('tip-note').hidden = false;
+    }).catch(function () { sampleFn = null; $('tip-note').hidden = false; });
+  }
+
+  /* Views: the list, or the About screen (#about) */
+  var currentView = 'list';
+
+  function viewFromHash() {
+    return (location.hash || '').replace('#', '') === 'about' ? 'about' : 'list';
+  }
+
+  function applyView(name) {
+    currentView = name === 'about' ? 'about' : 'list';
+    var about = currentView === 'about';
+    $('view-main').hidden = about;
+    $('view-about').hidden = !about;
+    document.querySelector('.wrap').classList.toggle('on-about', about);
+    $('about-btn').textContent = about ? 'Back to the list' : 'About this tool';
+  }
+
+  function goView(name) {
+    applyView(name);
+    window.scrollTo(0, 0);
+    try { location.hash = name === 'about' ? 'about' : ''; } catch (e) { /* hash unavailable */ }
+  }
+
+  $('about-btn').addEventListener('click', function () { goView(currentView === 'about' ? 'list' : 'about'); });
+  $('about-back').addEventListener('click', function () { goView('list'); });
+  window.addEventListener('hashchange', function () {
+    var v = viewFromHash();
+    if (v !== currentView) { applyView(v); window.scrollTo(0, 0); }
+  });
+
+  applyView(viewFromHash());
+  syncThemeBtn();
+  render();
+  initSample();
+})();
+</script>
+</body>
+</html>
